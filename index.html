@@ -13,6 +13,7 @@
   --accent:#2F6FED;--accent-soft:#EBF1FD;
   --green:#1D8348;--green-soft:#E9F7EF;
   --red:#C0392B;--red-soft:#FDEDEC;
+  --star:#D4A017;--star-soft:#FDF6E3;
   --tag-bg:#F0EDE8;
   --shadow-sm:0 1px 3px rgba(0,0,0,.06);
   --shadow-md:0 4px 16px rgba(0,0,0,.08);
@@ -26,6 +27,7 @@ body.dark{
   --accent:#4D8FF0;--accent-soft:#1A2A45;
   --green:#4CAF7D;--green-soft:#0E2218;
   --red:#E05C4B;--red-soft:#2A1210;
+  --star:#E8B84B;--star-soft:#2A2010;
   --tag-bg:#222120;
   --shadow-sm:0 1px 3px rgba(0,0,0,.3);
   --shadow-md:0 4px 16px rgba(0,0,0,.4);
@@ -80,13 +82,30 @@ body{font-family:'DM Mono',monospace;background:var(--bg);color:var(--text);min-
 @keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
 .card-cover{width:100%;aspect-ratio:1/1;object-fit:cover;display:block;border-bottom:1px solid var(--border);background:var(--tag-bg)}
 .card-cover-placeholder{width:100%;aspect-ratio:1/1;background:var(--tag-bg);display:flex;align-items:center;justify-content:center;border-bottom:1px solid var(--border);font-size:2rem;color:var(--text-light)}
-.card-body{padding:14px 16px 16px;display:flex;flex-direction:column;gap:4px;flex:1}
+.card-body{padding:12px 14px 14px;display:flex;flex-direction:column;gap:3px;flex:1}
 .card-title{font-family:'Instrument Serif',serif;font-size:1.05rem;font-weight:400;line-height:1.25;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.card-artist{font-size:.68rem;color:var(--text-muted);letter-spacing:.04em;text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.card-footer{display:flex;align-items:center;justify-content:space-between;margin-top:10px;gap:6px}
+.card-artist{font-size:.65rem;color:var(--text-muted);letter-spacing:.04em;text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+/* STAR RATING on card */
+.card-rating{display:flex;align-items:center;gap:1px;margin-top:5px}
+.card-star{font-size:.85rem;color:var(--border-strong);cursor:default;transition:color .1s;line-height:1}
+.card-star.filled{color:var(--star)}
+/* interactive only for admin */
+body.admin-mode .card-star{cursor:pointer}
+body.admin-mode .card-star:hover,
+body.admin-mode .card-star:hover ~ .card-star{color:var(--border-strong)}
+body.admin-mode .card-rating:hover .card-star{color:var(--star)}
+body.admin-mode .card-rating:hover .card-star:hover ~ .card-star{color:var(--border-strong)}
+
+.card-meta{display:flex;align-items:center;justify-content:space-between;margin-top:8px;gap:6px}
+.card-date{font-size:.58rem;color:var(--text-light);letter-spacing:.04em}
+.card-footer{display:flex;align-items:center;justify-content:space-between;margin-top:6px;gap:6px}
+
 .link-btn{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;background:var(--tag-bg);border:1px solid var(--border);border-radius:4px;text-decoration:none;font-family:'DM Mono',monospace;font-size:.63rem;color:var(--text-muted);letter-spacing:.04em;transition:all .12s}
 .link-btn:hover{background:var(--text);color:var(--bg);border-color:var(--text)}
 .link-btn svg{width:10px;height:10px;flex-shrink:0}
+.no-link{font-size:.6rem;color:var(--text-light);letter-spacing:.03em;font-style:italic}
+
 .listened-badge{display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:4px;font-size:.6rem;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;border:none;font-family:'DM Mono',monospace;transition:all .12s;flex-shrink:0}
 .listened-badge.yes{background:var(--green-soft);color:var(--green)}
 .listened-badge.no{background:var(--tag-bg);color:var(--text-muted)}
@@ -101,7 +120,7 @@ body.dark .card-icon-btn{background:rgba(26,25,23,.92)}
 .card-icon-btn svg{width:13px;height:13px}
 
 /* ADD CARD */
-.add-card{background:var(--surface);display:none;align-items:center;justify-content:center;cursor:pointer;transition:background .12s;min-height:200px;border:2px dashed transparent}
+.add-card{background:var(--surface);display:none;align-items:center;justify-content:center;cursor:pointer;transition:background .12s;min-height:220px;border:2px dashed transparent}
 body.admin-mode .add-card{display:flex}
 .add-card:hover{background:var(--accent-soft);border-color:var(--accent)}
 .add-card-inner{display:flex;flex-direction:column;align-items:center;gap:8px;color:var(--text-light);transition:color .12s}
@@ -119,34 +138,30 @@ body.admin-mode .add-card{display:flex}
 .modal-close{width:28px;height:28px;border-radius:6px;border:1px solid var(--border);background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--text-muted);transition:all .12s}
 .modal-close:hover{background:var(--surface-hover);color:var(--text)}
 .modal-close svg{width:14px;height:14px}
-.modal-body{padding:20px 24px;display:flex;flex-direction:column;gap:14px;max-height:72vh;overflow-y:auto}
+.modal-body{padding:20px 24px;display:flex;flex-direction:column;gap:14px;max-height:75vh;overflow-y:auto}
 .modal-footer{padding:16px 24px;border-top:1px solid var(--border);display:flex;gap:8px;justify-content:flex-end}
 
-/* SEARCH INPUT */
+/* SEARCH */
 .search-wrap{position:relative}
 .search-wrap svg{position:absolute;left:10px;top:50%;transform:translateY(-50%);width:14px;height:14px;color:var(--text-muted);pointer-events:none}
 .search-input{width:100%;padding:9px 12px 9px 32px;border:1px solid var(--border);border-radius:var(--radius);background:var(--surface);color:var(--text);font-family:'DM Mono',monospace;font-size:.8rem;outline:none;transition:border-color .12s}
 .search-input:focus{border-color:var(--accent)}
 .search-input::placeholder{color:var(--text-light)}
 
-/* SEARCH RESULTS */
-.search-results{display:flex;flex-direction:column;gap:2px;max-height:280px;overflow-y:auto;border:1px solid var(--border);border-radius:var(--radius);background:var(--surface)}
+.search-results{display:flex;flex-direction:column;gap:0;max-height:260px;overflow-y:auto;border:1px solid var(--border);border-radius:var(--radius);background:var(--surface)}
 .search-results:empty{display:none}
-.result-item{display:flex;align-items:center;gap:10px;padding:8px 10px;cursor:pointer;transition:background .1s;border-radius:0}
+.result-item{display:flex;align-items:center;gap:10px;padding:8px 10px;cursor:pointer;transition:background .1s;border-bottom:1px solid var(--border)}
+.result-item:last-child{border-bottom:none}
 .result-item:hover{background:var(--surface-hover)}
-.result-item:first-child{border-radius:var(--radius) var(--radius) 0 0}
-.result-item:last-child{border-radius:0 0 var(--radius) var(--radius)}
-.result-item.selected{background:var(--accent-soft);outline:2px solid var(--accent);outline-offset:-2px}
+.result-item.selected{background:var(--accent-soft)}
 .result-thumb{width:40px;height:40px;object-fit:cover;border-radius:4px;flex-shrink:0;background:var(--tag-bg)}
 .result-info{flex:1;min-width:0}
 .result-title{font-size:.78rem;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-family:'Instrument Serif',serif}
-.result-artist{font-size:.63rem;color:var(--text-muted);letter-spacing:.03em;text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.result-check{width:16px;height:16px;color:var(--accent);flex-shrink:0;display:none}
+.result-artist{font-size:.63rem;color:var(--text-muted);letter-spacing:.03em;text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px}
+.result-check{width:14px;height:14px;color:var(--accent);flex-shrink:0;display:none}
 .result-item.selected .result-check{display:block}
-
-/* SEARCH STATES */
-.search-state{padding:20px;text-align:center;font-size:.7rem;color:var(--text-muted);letter-spacing:.04em}
-.search-state svg{width:20px;height:20px;margin:0 auto 8px;display:block;opacity:.4}
+.search-state{padding:18px;text-align:center;font-size:.7rem;color:var(--text-muted);letter-spacing:.03em}
+.search-state svg{width:18px;height:18px;margin:0 auto 6px;display:block;opacity:.35}
 
 /* SELECTED PREVIEW */
 .selected-preview{display:none;align-items:center;gap:12px;padding:12px;background:var(--accent-soft);border:1px solid var(--accent);border-radius:var(--radius)}
@@ -154,17 +169,25 @@ body.admin-mode .add-card{display:flex}
 .selected-preview img{width:48px;height:48px;object-fit:cover;border-radius:6px;flex-shrink:0}
 .selected-preview-info{flex:1;min-width:0}
 .selected-preview-title{font-family:'Instrument Serif',serif;font-size:.95rem;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.selected-preview-artist{font-size:.65rem;color:var(--accent);letter-spacing:.04em;text-transform:uppercase;margin-top:2px}
+.selected-preview-artist{font-size:.63rem;color:var(--accent);letter-spacing:.04em;text-transform:uppercase;margin-top:2px}
 .selected-clear{background:none;border:none;cursor:pointer;color:var(--text-muted);padding:4px;border-radius:4px;transition:color .12s;flex-shrink:0}
 .selected-clear:hover{color:var(--red)}
 .selected-clear svg{width:14px;height:14px}
 
-/* FIELDS / BUTTONS */
+/* FIELDS */
 .field{display:flex;flex-direction:column;gap:5px}
 .field label{font-size:.65rem;color:var(--text-muted);letter-spacing:.08em;text-transform:uppercase}
 .field input{padding:8px 12px;border:1px solid var(--border);border-radius:var(--radius);background:var(--surface);color:var(--text);font-family:'DM Mono',monospace;font-size:.8rem;outline:none;transition:border-color .12s}
 .field input:focus{border-color:var(--accent)}
 .field input::placeholder{color:var(--text-light)}
+
+/* STAR PICKER in modal */
+.star-picker{display:flex;align-items:center;gap:2px}
+.star-picker-btn{background:none;border:none;cursor:pointer;font-size:1.3rem;color:var(--border-strong);transition:color .1s;padding:2px;line-height:1}
+.star-picker-btn.on{color:var(--star)}
+.star-picker-label{font-size:.65rem;color:var(--text-muted);margin-left:8px;letter-spacing:.04em}
+
+/* BUTTONS */
 .btn{padding:7px 16px;border-radius:var(--radius);border:1px solid var(--border);font-family:'DM Mono',monospace;font-size:.72rem;cursor:pointer;transition:all .12s;letter-spacing:.03em}
 .btn-ghost{background:transparent;color:var(--text-muted)}
 .btn-ghost:hover{background:var(--surface-hover);color:var(--text)}
@@ -193,6 +216,9 @@ body.admin-mode .add-card{display:flex}
 /* TOAST */
 .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(16px);background:var(--text);color:var(--bg);padding:8px 18px;border-radius:20px;font-size:.7rem;letter-spacing:.04em;opacity:0;pointer-events:none;transition:all .25s;z-index:300;white-space:nowrap}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+.section-divider{display:flex;align-items:center;gap:8px;color:var(--text-light);font-size:.62rem;letter-spacing:.06em;text-transform:uppercase}
+.section-divider::before,.section-divider::after{content:'';flex:1;height:1px;background:var(--border)}
 
 @media(max-width:720px){
   .page-header{padding:32px 20px 16px}
@@ -239,11 +265,11 @@ body.admin-mode .add-card{display:flex}
 
 <div class="grid" id="songGrid"></div>
 
-<!-- ADD / EDIT MODAL -->
+<!-- ADD MODAL -->
 <div class="modal-overlay" id="modalOverlay">
   <div class="modal">
     <div class="modal-header">
-      <span class="modal-title" id="modalTitle">Añadir canción</span>
+      <span class="modal-title">Añadir canción</span>
       <button class="modal-close" id="modalClose"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="3" x2="13" y2="13"/><line x1="13" y1="3" x2="3" y2="13"/></svg></button>
     </div>
     <div class="modal-body">
@@ -255,32 +281,53 @@ body.admin-mode .add-card{display:flex}
           <div class="selected-preview-title" id="previewTitle"></div>
           <div class="selected-preview-artist" id="previewArtist"></div>
         </div>
-        <button class="selected-clear" id="clearSelection" title="Cambiar">
+        <button class="selected-clear" id="clearSelection">
           <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="3" x2="13" y2="13"/><line x1="13" y1="3" x2="3" y2="13"/></svg>
         </button>
       </div>
 
-      <!-- Search -->
+      <!-- iTunes search -->
       <div id="searchSection">
         <div class="search-wrap">
           <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="6.5" cy="6.5" r="4"/><line x1="10" y1="10" x2="14" y2="14"/></svg>
           <input class="search-input" id="searchInput" type="text" placeholder="Busca una canción o artista…" autocomplete="off">
         </div>
-
         <div id="searchResults" class="search-results" style="margin-top:8px"></div>
       </div>
 
-      <!-- Manual override (collapsed by default) -->
-      <details id="manualSection" style="margin-top:4px">
-        <summary style="font-size:.68rem;color:var(--text-muted);cursor:pointer;letter-spacing:.04em;text-transform:uppercase;list-style:none;display:flex;align-items:center;gap:6px">
+      <div class="section-divider">datos de la canción</div>
+
+      <!-- Spotify link — always manual -->
+      <div class="field">
+        <label>🎧 Link de Spotify <span style="color:var(--text-light);font-size:.6rem">(obligatorio para el botón)</span></label>
+        <input type="url" id="manualLink" placeholder="https://open.spotify.com/track/…">
+      </div>
+
+      <!-- Rating picker -->
+      <div class="field">
+        <label>Valoración</label>
+        <div style="display:flex;align-items:center;gap:10px">
+          <div class="star-picker" id="modalStarPicker">
+            <button class="star-picker-btn" data-v="1">★</button>
+            <button class="star-picker-btn" data-v="2">★</button>
+            <button class="star-picker-btn" data-v="3">★</button>
+            <button class="star-picker-btn" data-v="4">★</button>
+            <button class="star-picker-btn" data-v="5">★</button>
+          </div>
+          <span class="star-picker-label" id="starLabel">Sin valorar</span>
+        </div>
+      </div>
+
+      <!-- Manual override -->
+      <details id="manualSection">
+        <summary style="font-size:.65rem;color:var(--text-muted);cursor:pointer;letter-spacing:.04em;text-transform:uppercase;list-style:none;display:flex;align-items:center;gap:6px;user-select:none">
           <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" style="width:11px;height:11px"><line x1="8" y1="2" x2="8" y2="14"/><line x1="2" y1="8" x2="14" y2="8"/></svg>
-          Editar manualmente
+          Editar título / artista / portada manualmente
         </summary>
         <div style="display:flex;flex-direction:column;gap:10px;margin-top:12px">
           <div class="field"><label>Título</label><input type="text" id="manualTitle" placeholder="Título de la canción"></div>
           <div class="field"><label>Artista</label><input type="text" id="manualArtist" placeholder="Artista"></div>
           <div class="field"><label>URL portada</label><input type="url" id="manualCover" placeholder="https://…"></div>
-          <div class="field"><label>Link</label><input type="url" id="manualLink" placeholder="https://open.spotify.com/…"></div>
         </div>
       </details>
 
@@ -320,7 +367,7 @@ body.admin-mode .add-card{display:flex}
     </div>
     <div class="modal-body">
       <span class="del-emoji">🗑️</span>
-      <p>¿Seguro que quieres eliminar <strong id="deleteSongName"></strong>? Esta acción no se puede deshacer.</p>
+      <p>¿Seguro que quieres eliminar <strong id="deleteSongName"></strong>?</p>
     </div>
     <div class="modal-footer">
       <button class="btn btn-ghost" id="deleteCancelBtn">Cancelar</button>
@@ -334,10 +381,8 @@ import { initializeApp }   from "https://www.gstatic.com/firebasejs/10.12.2/fire
 import { getFirestore, collection, doc, onSnapshot, setDoc, deleteDoc, updateDoc }
   from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-// ─────────────────────────────────────────────────────────────────
-// 🔑 CAMBIA ESTA CONTRASEÑA antes de publicar
-const ADMIN_PASSWORD = "musicboard2024";
-// ─────────────────────────────────────────────────────────────────
+// ── CONFIG ────────────────────────────────────────────────────────
+const ADMIN_PASSWORD = "musicboard2024"; // 🔑 CÁMBIALA
 
 const firebaseConfig = {
   apiKey: "AIzaSyCe7ZU3ko0rmUofYfbt1Giym0UfZnXkbO4",
@@ -358,8 +403,9 @@ let filter     = "all";
 let adminMode  = false;
 let deletingId = null;
 let darkMode   = localStorage.getItem('mb_dark') === 'true';
-let selectedTrack = null; // iTunes result chosen
+let selectedTrack = null;
 let searchTimer   = null;
+let modalRating   = 0; // 0 = sin valorar
 
 // ── ELEMENTS ──────────────────────────────────────────────────────
 const grid          = document.getElementById('songGrid');
@@ -371,6 +417,20 @@ const loadingScreen = document.getElementById('loadingScreen');
 // ── HELPERS ───────────────────────────────────────────────────────
 function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
+function formatDate(ts){
+  if(!ts) return '';
+  const d = ts.toDate ? ts.toDate() : new Date(ts);
+  return d.toLocaleDateString('es-ES',{day:'2-digit',month:'short',year:'numeric'});
+}
+
+function starsHtml(rating, interactive=false){
+  let html='';
+  for(let i=1;i<=5;i++){
+    html+=`<span class="card-star${i<=rating?' filled':''}" data-star="${i}">★</span>`;
+  }
+  return html;
+}
+
 let toastTimer;
 function showToast(msg){
   const t=document.getElementById('toast');
@@ -381,7 +441,7 @@ function showToast(msg){
 function setSyncing(v){ syncDot.className='sync-dot'+(v?' syncing':''); }
 function setError()   { syncDot.className='sync-dot error'; }
 
-// ── FIRESTORE REALTIME ────────────────────────────────────────────
+// ── FIRESTORE ─────────────────────────────────────────────────────
 let firstLoad=true;
 onSnapshot(songsCol, snap=>{
   songs=snap.docs.map(d=>({id:d.id,...d.data()}));
@@ -412,6 +472,10 @@ function render(){
     const card=document.createElement('div');
     card.className='card';
     card.style.animationDelay=`${i*35}ms`;
+
+    const rating = song.rating||0;
+    const dateStr = formatDate(song.addedAt);
+
     card.innerHTML=`
       ${song.cover?`<img class="card-cover" src="${esc(song.cover)}" alt="${esc(song.title)}" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">`:``}
       <div class="card-cover-placeholder" style="display:${song.cover?'none':'flex'}">🎵</div>
@@ -423,16 +487,38 @@ function render(){
       <div class="card-body">
         <div class="card-title">${esc(song.title)}</div>
         <div class="card-artist">${esc(song.artist)}</div>
+        <div class="card-rating">${starsHtml(rating)}</div>
+        <div class="card-meta">
+          <span class="card-date">${dateStr ? '+ '+dateStr : ''}</span>
+        </div>
         <div class="card-footer">
           ${song.link
             ?`<a class="link-btn" href="${esc(song.link)}" target="_blank" rel="noopener" onclick="event.stopPropagation()">
                 <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/></svg>
                 Escuchar</a>`
-            :`<span></span>`}
+            :`<span class="no-link">sin link</span>`}
           <button class="listened-badge ${song.listened?'yes':'no'}">${song.listened?'✓ Sí':'— No'}</button>
         </div>
       </div>`;
 
+    // ── Star rating (admin only — click on card stars) ──
+    card.querySelectorAll('.card-star').forEach(star=>{
+      star.addEventListener('click', async e=>{
+        if(!adminMode) return;
+        e.stopPropagation();
+        const newRating = parseInt(star.dataset.star);
+        // Toggle off if clicking same star
+        const finalRating = (song.rating===newRating) ? 0 : newRating;
+        song.rating=finalRating;
+        card.querySelector('.card-rating').innerHTML=starsHtml(finalRating);
+        setSyncing(true);
+        try{ await updateDoc(doc(db,'songs',song.id),{rating:finalRating}); }
+        catch(err){ setError(); }
+        setSyncing(false);
+      });
+    });
+
+    // ── Listened toggle ──
     card.querySelector('.listened-badge').addEventListener('click', async e=>{
       e.stopPropagation();
       const btn=e.currentTarget;
@@ -528,47 +614,38 @@ const previewTitle   = document.getElementById('previewTitle');
 const previewArtist  = document.getElementById('previewArtist');
 const saveBtn        = document.getElementById('modalSave');
 
-function showSearchState(icon, text){
+function showSearchState(icon,text){
   searchResults.innerHTML=`<div class="search-state">${icon}<div>${text}</div></div>`;
 }
 
 async function doSearch(q){
   if(!q.trim()){ searchResults.innerHTML=''; return; }
-  showSearchState(
-    `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="9"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>`,
-    'Buscando…'
-  );
+  showSearchState(`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="9"/></svg>`,'Buscando…');
   try{
     const url=`https://itunes.apple.com/search?term=${encodeURIComponent(q)}&entity=song&limit=8&media=music`;
     const res=await fetch(url);
     const data=await res.json();
     renderResults(data.results||[]);
   } catch(e){
-    showSearchState(
-      `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="9"/><line x1="12" y1="8" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>`,
-      'Error al buscar. Prueba de nuevo.'
-    );
+    showSearchState(`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="9"/><line x1="12" y1="8" x2="12" y2="13"/></svg>`,'Error al buscar. Prueba de nuevo.');
   }
 }
 
 function renderResults(results){
   if(!results.length){
-    showSearchState(
-      `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>`,
-      'Sin resultados. Prueba con otro nombre.'
-    );
+    showSearchState(`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>`,'Sin resultados.');
     return;
   }
   searchResults.innerHTML='';
   results.forEach(track=>{
-    const thumb=track.artworkUrl100||track.artworkUrl60||'';
+    const thumb=track.artworkUrl100||'';
     const item=document.createElement('div');
     item.className='result-item';
     item.innerHTML=`
-      ${thumb?`<img class="result-thumb" src="${esc(thumb)}" alt="" loading="lazy">`:`<div class="result-thumb" style="display:flex;align-items:center;justify-content:center;font-size:1.2rem">🎵</div>`}
+      ${thumb?`<img class="result-thumb" src="${esc(thumb)}" alt="" loading="lazy">`:`<div class="result-thumb" style="display:flex;align-items:center;justify-content:center;font-size:1.1rem">🎵</div>`}
       <div class="result-info">
         <div class="result-title">${esc(track.trackName||'')}</div>
-        <div class="result-artist">${esc(track.artistName||'')} — ${esc(track.collectionName||'')}</div>
+        <div class="result-artist">${esc(track.artistName||'')} · ${esc(track.collectionName||'')}</div>
       </div>
       <svg class="result-check" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><polyline points="2 8 6 12 14 4"/></svg>`;
     item.addEventListener('click',()=>selectTrack(track,item));
@@ -576,36 +653,34 @@ function renderResults(results){
   });
 }
 
-function selectTrack(track, itemEl){
-  // Deselect others
+function selectTrack(track,itemEl){
   searchResults.querySelectorAll('.result-item').forEach(el=>el.classList.remove('selected'));
   itemEl.classList.add('selected');
-
   selectedTrack=track;
 
-  // Show preview banner
-  const thumb=(track.artworkUrl100||track.artworkUrl60||'').replace('100x100','600x600');
+  const thumb=(track.artworkUrl100||'').replace('100x100','600x600');
   previewImg.src=thumb;
   previewTitle.textContent=track.trackName||'';
   previewArtist.textContent=track.artistName||'';
   selectedPreview.classList.add('visible');
 
-  // Populate manual fields too so user can tweak if needed
+  // Fill manual fields (title/artist/cover only — NOT link)
   document.getElementById('manualTitle').value=track.trackName||'';
   document.getElementById('manualArtist').value=track.artistName||'';
   document.getElementById('manualCover').value=thumb;
-  document.getElementById('manualLink').value=track.trackViewUrl||'';
+  // manualLink intentionally left untouched
 
-  saveBtn.disabled=false;
+  checkCanSave();
 }
 
 document.getElementById('clearSelection').addEventListener('click',()=>{
   selectedTrack=null;
   selectedPreview.classList.remove('visible');
   searchResults.querySelectorAll('.result-item').forEach(el=>el.classList.remove('selected'));
-  saveBtn.disabled=true;
-  // clear manual fields
-  ['manualTitle','manualArtist','manualCover','manualLink'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('manualTitle').value='';
+  document.getElementById('manualArtist').value='';
+  document.getElementById('manualCover').value='';
+  checkCanSave();
 });
 
 searchInput.addEventListener('input',()=>{
@@ -613,14 +688,38 @@ searchInput.addEventListener('input',()=>{
   searchTimer=setTimeout(()=>doSearch(searchInput.value),400);
 });
 
-// Enable save when manual fields are filled (even without iTunes selection)
-function checkManualFill(){
-  const t=document.getElementById('manualTitle').value.trim();
-  const a=document.getElementById('manualArtist').value.trim();
-  saveBtn.disabled=!(t&&a);
+// ── STAR PICKER (modal) ───────────────────────────────────────────
+function setModalRating(v){
+  modalRating=v;
+  document.querySelectorAll('#modalStarPicker .star-picker-btn').forEach(btn=>{
+    btn.classList.toggle('on', parseInt(btn.dataset.v)<=v);
+  });
+  const labels=['Sin valorar','Muy mala','Regular','Bien','Muy bien','Imprescindible'];
+  document.getElementById('starLabel').textContent=labels[v]||'Sin valorar';
+}
+
+document.querySelectorAll('#modalStarPicker .star-picker-btn').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    const v=parseInt(btn.dataset.v);
+    setModalRating(modalRating===v?0:v);
+  });
+  btn.addEventListener('mouseenter',()=>{
+    const v=parseInt(btn.dataset.v);
+    document.querySelectorAll('#modalStarPicker .star-picker-btn').forEach(b=>{
+      b.classList.toggle('on', parseInt(b.dataset.v)<=v);
+    });
+  });
+  btn.addEventListener('mouseleave',()=>setModalRating(modalRating));
+});
+
+// ── CAN SAVE? ─────────────────────────────────────────────────────
+function checkCanSave(){
+  const title  = document.getElementById('manualTitle').value.trim()  || selectedTrack?.trackName  || '';
+  const artist = document.getElementById('manualArtist').value.trim() || selectedTrack?.artistName || '';
+  saveBtn.disabled = !(title && artist);
 }
 ['manualTitle','manualArtist','manualCover','manualLink'].forEach(id=>{
-  document.getElementById(id).addEventListener('input',checkManualFill);
+  document.getElementById(id).addEventListener('input',checkCanSave);
 });
 
 // ── ADD MODAL ─────────────────────────────────────────────────────
@@ -632,8 +731,8 @@ function openAddModal(){
   searchInput.value='';
   searchResults.innerHTML='';
   ['manualTitle','manualArtist','manualCover','manualLink'].forEach(id=>document.getElementById(id).value='');
+  setModalRating(0);
   saveBtn.disabled=true;
-  document.getElementById('modalTitle').textContent='Añadir canción';
   modalOverlay.classList.add('open');
   setTimeout(()=>searchInput.focus(),200);
 }
@@ -644,18 +743,23 @@ document.getElementById('modalCancel').addEventListener('click',closeModal);
 modalOverlay.addEventListener('click',e=>{ if(e.target===modalOverlay) closeModal(); });
 
 document.getElementById('modalSave').addEventListener('click', async()=>{
-  // Prefer manual fields (user may have tweaked), fallback to iTunes data
   const title  = document.getElementById('manualTitle').value.trim()  || selectedTrack?.trackName   || '';
   const artist = document.getElementById('manualArtist').value.trim() || selectedTrack?.artistName  || '';
   const cover  = document.getElementById('manualCover').value.trim()  || (selectedTrack?.artworkUrl100||'').replace('100x100','600x600');
-  const link   = document.getElementById('manualLink').value.trim()   || selectedTrack?.trackViewUrl || '';
+  const link   = document.getElementById('manualLink').value.trim();  // always manual, never from iTunes
 
-  if(!title||!artist){ return; }
+  if(!title||!artist) return;
 
   setSyncing(true);
   try{
     const newId=Date.now().toString();
-    await setDoc(doc(db,'songs',newId),{ title, artist, cover, link, listened:false, order:songs.length });
+    await setDoc(doc(db,'songs',newId),{
+      title, artist, cover, link,
+      listened: false,
+      rating: modalRating,
+      addedAt: new Date(),
+      order: songs.length
+    });
     showToast('Canción añadida ✓');
     closeModal();
   } catch(err){ setError(); console.error(err); }
