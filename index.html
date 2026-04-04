@@ -375,7 +375,7 @@ body.admin-mode .add-card{display:flex}
 <div class="modal-overlay" id="modalOverlay">
   <div class="modal">
     <div class="modal-header">
-      <span class="modal-title">Añadir canción</span>
+      <span class="modal-title" id="modalTitle">Añadir canción</span>
       <button class="modal-close" id="modalClose"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="3" x2="13" y2="13"/><line x1="13" y1="3" x2="3" y2="13"/></svg></button>
     </div>
     <div class="modal-body">
@@ -451,7 +451,7 @@ body.admin-mode .add-card{display:flex}
     </div>
     <div class="modal-footer">
       <button class="btn btn-ghost" id="modalCancel">Cancelar</button>
-      <button class="btn btn-primary" id="modalSave" disabled>Añadir</button>
+      <button class="btn btn-primary" id="modalSave" disabled>Guardar</button>
     </div>
   </div>
 </div>
@@ -521,6 +521,7 @@ let songs         = [];
 let filter        = "all";
 let adminMode     = false;
 let deletingId    = null;
+let editingId     = null;  // null = add mode, string = edit mode
 let darkMode      = localStorage.getItem('mb_dark') === 'true';
 let selectedTrack = null;
 let searchTimer   = null;
@@ -618,6 +619,9 @@ function render(){
         <span class="audio-badge">${isNowPlaying?'▶ reproduciendo':'♪ audio'}</span>`:''}
       </div>
       <div class="card-admin-actions">
+        <button class="card-icon-btn edit-btn" title="Editar">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M11.5 2.5l2 2-9 9-2.5.5.5-2.5 9-9z"/></svg>
+        </button>
         <button class="card-icon-btn delete-btn" title="Eliminar">
           <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="3 5 13 5"/><path d="M6 5V3h4v2"/><rect x="4" y="5" width="8" height="9" rx="1"/></svg>
         </button>
@@ -693,6 +697,7 @@ function render(){
     });
 
     if(adminMode){
+      card.querySelector('.edit-btn').addEventListener('click',e=>{ e.stopPropagation(); openEditModal(song.id); });
       card.querySelector('.delete-btn').addEventListener('click',e=>{ e.stopPropagation(); openDeleteModal(song.id); });
     }
 
@@ -944,6 +949,7 @@ function checkCanSave(){
 const modalOverlay=document.getElementById('modalOverlay');
 
 function openAddModal(){
+  editingId=null;
   selectedTrack=null; pendingAudioUrl=null; isUploading=false;
   selectedPreview.classList.remove('visible');
   searchInput.value=''; searchResults.innerHTML='';
@@ -955,12 +961,66 @@ function openAddModal(){
   uploadProgress.classList.remove('visible');
   uploadFill.style.width='0%';
   setModalRating(0);
+  document.getElementById('modalTitle').textContent='Añadir canción';
+  document.getElementById('searchSection').style.display='';
+  selectedPreview.style.display='';
   saveBtn.disabled=true;
   modalOverlay.classList.add('open');
   setTimeout(()=>searchInput.focus(),200);
 }
 
-function closeModal(){ modalOverlay.classList.remove('open'); }
+function openEditModal(id){
+  const song=songs.find(s=>s.id===id);
+  if(!song) return;
+  editingId=id;
+  selectedTrack=null; pendingAudioUrl=null; isUploading=false;
+
+  // Hide iTunes search in edit mode — we already have the song
+  document.getElementById('searchSection').style.display='none';
+  selectedPreview.classList.remove('visible');
+  selectedPreview.style.display='none';
+
+  // Pre-fill fields
+  document.getElementById('manualTitle').value=song.title||'';
+  document.getElementById('manualArtist').value=song.artist||'';
+  document.getElementById('manualCover').value=song.cover||'';
+  document.getElementById('manualLink').value=song.link||'';
+
+  // Audio state
+  audioFileInput.value='';
+  uploadProgress.classList.remove('visible');
+  uploadFill.style.width='0%';
+  if(song.audioUrl){
+    audioUploadArea.classList.add('has-file');
+    audioUploadArea.classList.remove('uploading');
+    audioUploadLabel.textContent='✓ Audio existente';
+    audioUploadSub.textContent='Sube otro archivo para reemplazarlo';
+  } else {
+    audioUploadArea.classList.remove('has-file','uploading');
+    audioUploadLabel.textContent='Subir MP3 / WAV / M4A';
+    audioUploadSub.textContent='El usuario podrá escucharlo directamente';
+  }
+
+  setModalRating(song.rating||0);
+  document.getElementById('modalTitle').textContent='Editar canción';
+
+  // Open the manual details so fields are visible
+  const details=modalOverlay.querySelector('details');
+  if(details) details.open=true;
+
+  saveBtn.disabled=false;
+  modalOverlay.classList.add('open');
+}
+
+function closeModal(){
+  modalOverlay.classList.remove('open');
+  editingId=null;
+  // restore search section for next add
+  document.getElementById('searchSection').style.display='';
+  selectedPreview.style.display='';
+  const details=modalOverlay.querySelector('details');
+  if(details) details.open=false;
+}
 document.getElementById('modalClose').addEventListener('click',closeModal);
 document.getElementById('modalCancel').addEventListener('click',closeModal);
 modalOverlay.addEventListener('click',e=>{ if(e.target===modalOverlay) closeModal(); });
@@ -972,18 +1032,32 @@ document.getElementById('modalSave').addEventListener('click', async()=>{
   const cover  =document.getElementById('manualCover').value.trim() ||(selectedTrack?.artworkUrl100||'').replace('100x100','600x600');
   const link   =document.getElementById('manualLink').value.trim();
   if(!title||!artist) return;
+
   setSyncing(true);
   try{
-    const newId=Date.now().toString();
-    await setDoc(doc(db,'songs',newId),{
-      title, artist, cover, link,
-      audioUrl: pendingAudioUrl||'',
-      listened: false,
-      rating: modalRating,
-      addedAt: new Date(),
-      order: songs.length
-    });
-    showToast('Canción añadida ✓');
+    if(editingId){
+      // EDIT MODE — only update audioUrl if a new file was uploaded
+      const existing=songs.find(s=>s.id===editingId);
+      const audioUrl=pendingAudioUrl!==null ? pendingAudioUrl : (existing?.audioUrl||'');
+      await updateDoc(doc(db,'songs',editingId),{
+        title, artist, cover, link,
+        audioUrl,
+        rating: modalRating,
+      });
+      showToast('Canción actualizada ✓');
+    } else {
+      // ADD MODE
+      const newId=Date.now().toString();
+      await setDoc(doc(db,'songs',newId),{
+        title, artist, cover, link,
+        audioUrl: pendingAudioUrl||'',
+        listened: false,
+        rating: modalRating,
+        addedAt: new Date(),
+        order: songs.length
+      });
+      showToast('Canción añadida ✓');
+    }
     closeModal();
   } catch(err){ setError(); console.error(err); }
   setSyncing(false);
