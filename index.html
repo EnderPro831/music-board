@@ -280,16 +280,237 @@ body.admin-mode .add-card{display:flex}
 .toast{position:fixed;bottom:100px;left:50%;transform:translateX(-50%) translateY(16px);background:var(--text);color:var(--bg);padding:8px 18px;border-radius:20px;font-size:.7rem;letter-spacing:.04em;opacity:0;pointer-events:none;transition:all .25s;z-index:300;white-space:nowrap}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 
+/* ── VIEW TOGGLE (mobile only) ── */
+.view-toggle{display:none}
 @media(max-width:720px){
-  .page-header{padding:32px 20px 16px}
-  .page-divider{padding:0 20px}
-  .toolbar{padding:10px 20px}
-  .grid{margin:0 20px 40px;padding:0}
-  .page-title{font-size:2rem}
+  .view-toggle{display:flex}
+  .page-header{padding:24px 18px 16px}
+  .page-divider{padding:0 18px}
+  .toolbar{padding:10px 18px}
+  .grid{margin:0 12px 40px;padding:0}
+  .page-title{font-size:1.9rem}
   .player-info{flex:0 0 120px}
   .player-right{flex:0 0 auto}
   .player-vol-wrap{display:none}
 }
+
+/* ── TIKTOK SCROLL VIEW ── */
+#scrollView{
+  display:none;
+  position:fixed;
+  inset:0;
+  z-index:50;
+  background:#000;
+  overflow-y:scroll;
+  scroll-snap-type:y mandatory;
+  -webkit-overflow-scrolling:touch;
+}
+#scrollView.active{display:block}
+body.scroll-mode .grid,
+body.scroll-mode .toolbar,
+body.scroll-mode .page-divider{display:none}
+body.scroll-mode{padding-bottom:0}
+body.scroll-mode #player{z-index:60}
+
+.sv-slide{
+  height:100dvh;
+  scroll-snap-align:start;
+  scroll-snap-stop:always;
+  position:relative;
+  display:flex;
+  align-items:flex-end;
+  overflow:hidden;
+  background:#000;
+}
+
+/* full bleed blurred cover as bg */
+.sv-bg{
+  position:absolute;inset:0;
+  background-size:cover;
+  background-position:center;
+  filter:blur(28px) brightness(.45) saturate(1.3);
+  transform:scale(1.08);
+  transition:opacity .4s;
+}
+.sv-cover{
+  position:absolute;
+  top:0;left:0;right:0;
+  height:58%;
+  object-fit:cover;
+  display:block;
+}
+.sv-cover-placeholder{
+  position:absolute;
+  top:0;left:0;right:0;
+  height:58%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:4rem;
+  background:rgba(255,255,255,.05);
+}
+
+/* gradient overlay */
+.sv-gradient{
+  position:absolute;inset:0;
+  background:linear-gradient(to bottom,
+    rgba(0,0,0,0) 30%,
+    rgba(0,0,0,.7) 60%,
+    rgba(0,0,0,.95) 100%);
+}
+
+/* right sidebar actions (TikTok style) */
+.sv-sidebar{
+  position:absolute;
+  right:14px;
+  bottom:110px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:20px;
+  z-index:2;
+}
+.sv-action{
+  display:flex;flex-direction:column;align-items:center;gap:4px;
+  cursor:pointer;
+}
+.sv-action-btn{
+  width:46px;height:46px;
+  border-radius:50%;
+  background:rgba(255,255,255,.15);
+  backdrop-filter:blur(8px);
+  -webkit-backdrop-filter:blur(8px);
+  border:1px solid rgba(255,255,255,.2);
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;
+  transition:all .15s;
+  font-size:1.1rem;
+}
+.sv-action-btn svg{width:20px;height:20px;color:#fff}
+.sv-action-btn:hover,.sv-action-btn:active{background:rgba(255,255,255,.28);transform:scale(1.08)}
+.sv-action-btn.active-green{background:rgba(29,131,72,.5);border-color:rgba(76,175,125,.6)}
+.sv-action-btn.active-accent{background:rgba(47,111,237,.5);border-color:rgba(77,143,240,.6)}
+.sv-action-label{font-size:.55rem;color:rgba(255,255,255,.7);letter-spacing:.05em;text-transform:uppercase;text-align:center}
+
+/* play button center */
+.sv-play-center{
+  position:absolute;
+  top:29%;left:50%;
+  transform:translate(-50%,-50%);
+  z-index:3;
+  opacity:0;
+  transition:opacity .2s;
+}
+.sv-slide.has-audio:hover .sv-play-center,
+.sv-slide.has-audio.touch-show .sv-play-center{opacity:1}
+.sv-slide.playing .sv-play-center{opacity:1}
+.sv-play-circle{
+  width:60px;height:60px;
+  border-radius:50%;
+  background:rgba(255,255,255,.9);
+  display:flex;align-items:center;justify-content:center;
+  transition:transform .15s;
+}
+.sv-play-circle svg{width:24px;height:24px;color:#111;margin-left:2px}
+.sv-slide.playing .sv-play-circle svg.icon-play{display:none}
+.sv-slide:not(.playing) .sv-play-circle svg.icon-pause{display:none}
+
+/* info bottom left */
+.sv-info{
+  position:relative;
+  z-index:2;
+  padding:0 70px 100px 18px;
+  flex:1;
+}
+.sv-title{
+  font-family:'Instrument Serif',serif;
+  font-size:1.6rem;
+  font-weight:400;
+  color:#fff;
+  line-height:1.2;
+  margin-bottom:4px;
+  text-shadow:0 2px 12px rgba(0,0,0,.5);
+}
+.sv-artist{
+  font-size:.68rem;
+  color:rgba(255,255,255,.7);
+  letter-spacing:.06em;
+  text-transform:uppercase;
+  margin-bottom:10px;
+}
+.sv-admin-rating{display:flex;gap:2px;margin-bottom:8px}
+.sv-admin-star{font-size:.9rem;color:rgba(255,255,255,.25)}
+.sv-admin-star.filled{color:#E8B84B}
+.sv-date{font-size:.58rem;color:rgba(255,255,255,.4);letter-spacing:.04em;margin-bottom:14px}
+
+/* user stars in scroll view */
+.sv-user-stars{display:flex;align-items:center;gap:3px;margin-bottom:0}
+.sv-user-star{
+  font-size:1.1rem;
+  color:rgba(255,255,255,.3);
+  cursor:pointer;
+  background:none;border:none;padding:2px;
+  transition:color .1s;line-height:1;
+}
+.sv-user-star.filled{color:#4D8FF0}
+
+/* progress bar in scroll slide */
+.sv-progress-wrap{
+  position:absolute;
+  bottom:76px;left:18px;right:18px;
+  z-index:2;
+  display:none;
+  align-items:center;
+  gap:8px;
+}
+.sv-slide.has-audio .sv-progress-wrap{display:flex}
+.sv-progress-time{font-size:.58rem;color:rgba(255,255,255,.6);width:30px;flex-shrink:0;text-align:center}
+.sv-progress-bar{flex:1;height:3px;background:rgba(255,255,255,.2);border-radius:2px;cursor:pointer;position:relative}
+.sv-progress-fill{height:100%;background:#fff;border-radius:2px;transition:width .1s linear;pointer-events:none}
+
+/* counter badge top */
+.sv-counter{
+  position:absolute;
+  top:env(safe-area-inset-top, 16px);
+  left:50%;transform:translateX(-50%);
+  font-size:.6rem;
+  color:rgba(255,255,255,.5);
+  letter-spacing:.08em;
+  text-transform:uppercase;
+  z-index:3;
+  pointer-events:none;
+}
+
+/* close scroll view button */
+.sv-close{
+  position:fixed;
+  top:calc(env(safe-area-inset-top,0px) + 12px);
+  right:14px;
+  z-index:55;
+  width:36px;height:36px;
+  border-radius:50%;
+  background:rgba(0,0,0,.5);
+  backdrop-filter:blur(8px);
+  -webkit-backdrop-filter:blur(8px);
+  border:1px solid rgba(255,255,255,.15);
+  display:none;
+  align-items:center;justify-content:center;
+  cursor:pointer;
+}
+.sv-close.visible{display:flex}
+.sv-close svg{width:16px;height:16px;color:#fff}
+
+/* swipe hint */
+.sv-hint{
+  position:absolute;
+  bottom:88px;left:50%;transform:translateX(-50%);
+  font-size:.58rem;color:rgba(255,255,255,.35);
+  letter-spacing:.06em;text-transform:uppercase;
+  pointer-events:none;
+  animation:hint-fade 3s ease 1.5s forwards;
+  opacity:1;
+  white-space:nowrap;
+  z-index:2;
+}
+@keyframes hint-fade{0%{opacity:1}80%{opacity:1}100%{opacity:0}}
 </style>
 </head>
 <body>
@@ -307,6 +528,9 @@ body.admin-mode .add-card{display:flex}
     </div>
     <div class="header-actions">
       <div class="sync-dot" id="syncDot" title="Sincronizado"></div>
+      <button class="icon-btn view-toggle" id="viewToggle" title="Vista scroll">
+        <svg id="viewToggleIcon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="12" height="4" rx="1"/><rect x="2" y="8" width="12" height="4" rx="1"/></svg>
+      </button>
       <button class="icon-btn" id="themeToggle">
         <svg id="themeIcon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"></svg>
       </button>
@@ -370,6 +594,12 @@ body.admin-mode .add-card{display:flex}
     </button>
   </div>
 </div>
+
+<!-- SCROLL VIEW (mobile TikTok mode) -->
+<div id="scrollView"></div>
+<button class="sv-close" id="svClose">
+  <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="3" x2="13" y2="13"/><line x1="13" y1="3" x2="3" y2="13"/></svg>
+</button>
 
 <!-- ADD MODAL -->
 <div class="modal-overlay" id="modalOverlay">
@@ -711,6 +941,8 @@ function render(){
     addCard.addEventListener('click',openAddModal);
     grid.appendChild(addCard);
   }
+  // Sync scroll view if active
+  if(scrollMode) buildScrollView();
 }
 
 // ── AUDIO PLAYER ──────────────────────────────────────────────────
@@ -1109,7 +1341,252 @@ document.getElementById('deleteConfirmBtn').addEventListener('click', async()=>{
   setSyncing(false); closeDelete();
 });
 
-// ── THEME ─────────────────────────────────────────────────────────
+// ── SCROLL VIEW ───────────────────────────────────────────────────
+const scrollView   = document.getElementById('scrollView');
+const svClose      = document.getElementById('svClose');
+const viewToggle   = document.getElementById('viewToggle');
+const viewToggleIcon = document.getElementById('viewToggleIcon');
+let scrollMode     = false;
+let svObserver     = null;
+
+const GRID_ICON   = `<rect x="2" y="2" width="5" height="5" rx="1"/><rect x="9" y="2" width="5" height="5" rx="1"/><rect x="2" y="9" width="5" height="5" rx="1"/><rect x="9" y="9" width="5" height="5" rx="1"/>`;
+const SCROLL_ICON = `<rect x="2" y="2" width="12" height="4" rx="1"/><rect x="2" y="8" width="12" height="4" rx="1"/>`;
+
+const uLabels2=['','Mala','Regular','Bien','Muy bien','Imprescindible'];
+
+function fmtTime2(s){ if(!s||isNaN(s)) return '0:00'; const m=Math.floor(s/60); const ss=Math.floor(s%60); return `${m}:${ss.toString().padStart(2,'0')}`; }
+
+function buildScrollView(){
+  scrollView.innerHTML='';
+  if(svObserver){ svObserver.disconnect(); svObserver=null; }
+
+  const visible=songs.filter(s=>{
+    if(filter==='not') return !s.listened;
+    if(filter==='yes') return !!s.listened;
+    return true;
+  });
+
+  if(!visible.length){
+    scrollView.innerHTML=`<div style="height:100dvh;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:12px;color:rgba(255,255,255,.4)"><div style="font-size:2.5rem">🎧</div><div style="font-size:.75rem;letter-spacing:.06em;text-transform:uppercase">No hay canciones</div></div>`;
+    return;
+  }
+
+  visible.forEach((song,i)=>{
+    const hasAudio=!!song.audioUrl;
+    const isNowPlaying=currentSongId===song.id&&isPlaying;
+    const uRating=userRatings[song.id]||0;
+    const adminRating=song.rating||0;
+    const dateStr=song.addedAt ? (song.addedAt.toDate?song.addedAt.toDate():new Date(song.addedAt)).toLocaleDateString('es-ES',{day:'2-digit',month:'short',year:'numeric'}) : '';
+
+    const slide=document.createElement('div');
+    slide.className=`sv-slide${hasAudio?' has-audio':''}${isNowPlaying?' playing':''}`;
+    slide.dataset.id=song.id;
+
+    const coverSrc=song.cover||'';
+    const adminStars=[1,2,3,4,5].map(v=>`<span class="sv-admin-star${v<=adminRating?' filled':''}">★</span>`).join('');
+    const userStars=[1,2,3,4,5].map(v=>`<button class="sv-user-star${v<=uRating?' filled':''}" data-v="${v}">★</button>`).join('');
+
+    slide.innerHTML=`
+      <div class="sv-bg" style="background-image:url('${esc(coverSrc)}')"></div>
+      ${coverSrc
+        ? `<img class="sv-cover" src="${esc(coverSrc)}" alt="${esc(song.title)}" loading="lazy">`
+        : `<div class="sv-cover-placeholder">🎵</div>`}
+      <div class="sv-gradient"></div>
+      <span class="sv-counter">${i+1} / ${visible.length}</span>
+
+      ${hasAudio?`
+      <div class="sv-play-center">
+        <div class="sv-play-circle">
+          <svg class="icon-play" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+          <svg class="icon-pause" viewBox="0 0 24 24" fill="currentColor"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+        </div>
+      </div>`:''}
+
+      <div class="sv-sidebar">
+        <div class="sv-action">
+          <div class="sv-action-btn listened-toggle ${song.listened?'active-green':''}" data-id="${song.id}">
+            ${song.listened
+              ? `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>`
+              : `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>`}
+          </div>
+          <span class="sv-action-label">${song.listened?'escuchada':'marcar'}</span>
+        </div>
+        ${song.link?`
+        <div class="sv-action">
+          <a class="sv-action-btn" href="${esc(song.link)}" target="_blank" rel="noopener" onclick="event.stopPropagation()" style="text-decoration:none">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/></svg>
+          </a>
+          <span class="sv-action-label">spotify</span>
+        </div>`:''}
+      </div>
+
+      <div class="sv-info">
+        <div class="sv-title">${esc(song.title)}</div>
+        <div class="sv-artist">${esc(song.artist)}</div>
+        ${adminRating>0?`<div class="sv-admin-rating">${adminStars}</div>`:''}
+        ${dateStr?`<div class="sv-date">+ ${dateStr}</div>`:''}
+        <div class="sv-user-stars">${userStars}</div>
+      </div>
+
+      ${hasAudio?`
+      <div class="sv-progress-wrap">
+        <span class="sv-progress-time sv-cur">0:00</span>
+        <div class="sv-progress-bar">
+          <div class="sv-progress-fill" style="width:0%"></div>
+        </div>
+        <span class="sv-progress-time sv-dur">0:00</span>
+      </div>`:''}
+
+      ${i===0?`<div class="sv-hint">desliza para ver más ↑</div>`:''}
+    `;
+
+    // Play / pause tap
+    if(hasAudio){
+      const playCenter=slide.querySelector('.sv-play-center');
+      const playArea=slide.querySelector('.sv-cover')||slide.querySelector('.sv-cover-placeholder');
+      const handlePlay=e=>{
+        e.stopPropagation();
+        if(currentSongId===song.id) togglePlay();
+        else playSong(song);
+        syncSvSlide(slide,song.id);
+      };
+      if(playCenter) playCenter.addEventListener('click',handlePlay);
+      // tap on cover area to show play button briefly
+      slide.addEventListener('click',e=>{
+        if(e.target.closest('.sv-sidebar')||e.target.closest('.sv-progress-bar')||e.target.closest('.sv-user-stars')) return;
+        if(hasAudio){
+          slide.classList.add('touch-show');
+          clearTimeout(slide._touchTimer);
+          slide._touchTimer=setTimeout(()=>slide.classList.remove('touch-show'),2000);
+          if(currentSongId===song.id) togglePlay();
+          else playSong(song);
+          syncSvSlide(slide,song.id);
+        }
+      });
+    }
+
+    // Listened toggle
+    const listenedBtn=slide.querySelector('.listened-toggle');
+    listenedBtn.addEventListener('click', async e=>{
+      e.stopPropagation();
+      const now=!song.listened;
+      song.listened=now;
+      listenedBtn.className=`sv-action-btn listened-toggle ${now?'active-green':''}`;
+      listenedBtn.innerHTML=now
+        ? `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>`
+        : `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>`;
+      listenedBtn.nextElementSibling.textContent=now?'escuchada':'marcar';
+      setSyncing(true);
+      try{ await updateDoc(doc(db,'songs',song.id),{listened:now}); } catch(err){ setError(); }
+      setSyncing(false);
+    });
+
+    // User stars
+    const uStarBtns=slide.querySelectorAll('.sv-user-star');
+    uStarBtns.forEach(star=>{
+      star.addEventListener('click',e=>{
+        e.stopPropagation();
+        const v=parseInt(star.dataset.v);
+        const prev=userRatings[song.id]||0;
+        const next=prev===v?0:v;
+        userRatings[song.id]=next;
+        localStorage.setItem('mb_user_ratings',JSON.stringify(userRatings));
+        uStarBtns.forEach(s=>s.classList.toggle('filled',parseInt(s.dataset.v)<=next));
+      });
+    });
+
+    // Progress bar tap
+    if(hasAudio){
+      const bar=slide.querySelector('.sv-progress-bar');
+      bar.addEventListener('click',e=>{
+        e.stopPropagation();
+        if(currentSongId!==song.id) return;
+        const rect=bar.getBoundingClientRect();
+        audio.currentTime=((e.clientX-rect.left)/rect.width)*audio.duration;
+      });
+    }
+
+    scrollView.appendChild(slide);
+  });
+
+  // IntersectionObserver to auto-play when slide enters view
+  svObserver=new IntersectionObserver(entries=>{
+    entries.forEach(entry=>{
+      if(entry.isIntersecting&&entry.intersectionRatio>=0.8){
+        const id=entry.target.dataset.id;
+        const song=songs.find(s=>s.id===id);
+        if(song?.audioUrl && currentSongId!==song.id){
+          playSong(song);
+          syncAllSvSlides();
+        }
+      }
+    });
+  },{threshold:0.8});
+
+  scrollView.querySelectorAll('.sv-slide').forEach(s=>svObserver.observe(s));
+
+  // Keep progress bars in sync via audio events (stored refs)
+  updateSvProgress();
+}
+
+function syncSvSlide(slide,songId){
+  const isNow=currentSongId===songId&&isPlaying;
+  slide.classList.toggle('playing',isNow);
+}
+function syncAllSvSlides(){
+  scrollView.querySelectorAll('.sv-slide').forEach(slide=>{
+    slide.classList.toggle('playing',currentSongId===slide.dataset.id&&isPlaying);
+  });
+}
+
+function updateSvProgress(){
+  if(!scrollMode) return;
+  const slide=scrollView.querySelector(`.sv-slide[data-id="${currentSongId}"]`);
+  if(slide&&audio.duration){
+    const fill=slide.querySelector('.sv-progress-fill');
+    const cur=slide.querySelector('.sv-cur');
+    const dur=slide.querySelector('.sv-dur');
+    if(fill) fill.style.width=((audio.currentTime/audio.duration)*100)+'%';
+    if(cur)  cur.textContent=fmtTime2(audio.currentTime);
+    if(dur)  dur.textContent=fmtTime2(audio.duration);
+  }
+  requestAnimationFrame(updateSvProgress);
+}
+
+// Hook audio events to sync scroll slides
+audio.addEventListener('play',()=>{ if(scrollMode) syncAllSvSlides(); });
+audio.addEventListener('pause',()=>{ if(scrollMode) syncAllSvSlides(); });
+
+// Toggle scroll mode
+viewToggle.addEventListener('click',()=>{
+  scrollMode=!scrollMode;
+  document.body.classList.toggle('scroll-mode',scrollMode);
+  scrollView.classList.toggle('active',scrollMode);
+  svClose.classList.toggle('visible',scrollMode);
+  viewToggle.classList.toggle('active',scrollMode);
+  viewToggleIcon.innerHTML=scrollMode?GRID_ICON:SCROLL_ICON;
+  if(scrollMode){
+    buildScrollView();
+    updateSvProgress();
+  } else {
+    if(svObserver){ svObserver.disconnect(); svObserver=null; }
+    render();
+  }
+});
+
+svClose.addEventListener('click',()=>{
+  scrollMode=false;
+  document.body.classList.remove('scroll-mode');
+  scrollView.classList.remove('active');
+  svClose.classList.remove('visible');
+  viewToggle.classList.remove('active');
+  viewToggleIcon.innerHTML=SCROLL_ICON;
+  if(svObserver){ svObserver.disconnect(); svObserver=null; }
+  render();
+});
+
+// Rebuild scroll view when songs change (if active)
+// (hooked inside render() via scrollMode flag check at bottom of render)
 const themeIcon=document.getElementById('themeIcon');
 const MOON=`<path d="M13 8A5 5 0 1 1 8 3a3.5 3.5 0 0 0 5 5z" fill="currentColor" stroke="none"/>`;
 const SUN =`<circle cx="8" cy="8" r="3"/><line x1="8" y1="1" x2="8" y2="2.5"/><line x1="8" y1="13.5" x2="8" y2="15"/><line x1="1" y1="8" x2="2.5" y2="8"/><line x1="13.5" y1="8" x2="15" y2="8"/><line x1="3" y1="3" x2="4.1" y2="4.1"/><line x1="11.9" y1="11.9" x2="13" y2="13"/><line x1="13" y1="3" x2="11.9" y2="4.1"/><line x1="4.1" y1="11.9" x2="3" y2="13"/>`;
