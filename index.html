@@ -310,7 +310,8 @@ body.scroll-mode .grid,
 body.scroll-mode .toolbar,
 body.scroll-mode .page-divider{display:none}
 body.scroll-mode{padding-bottom:0}
-body.scroll-mode #player{z-index:60}
+/* hide global player bar in scroll mode — slide has its own controls */
+body.scroll-mode #player{display:none !important}
 
 .sv-slide{
   height:100dvh;
@@ -361,7 +362,7 @@ body.scroll-mode #player{z-index:60}
 .sv-sidebar{
   position:absolute;
   right:14px;
-  bottom:110px;
+  bottom:calc(env(safe-area-inset-bottom, 0px) + 52px);
   display:flex;
   flex-direction:column;
   align-items:center;
@@ -417,7 +418,7 @@ body.scroll-mode #player{z-index:60}
 .sv-info{
   position:relative;
   z-index:2;
-  padding:0 70px 100px 18px;
+  padding:0 70px 56px 18px;
   flex:1;
 }
 .sv-title{
@@ -455,7 +456,8 @@ body.scroll-mode #player{z-index:60}
 /* progress bar in scroll slide */
 .sv-progress-wrap{
   position:absolute;
-  bottom:76px;left:18px;right:18px;
+  bottom:calc(env(safe-area-inset-bottom, 0px) + 18px);
+  left:18px;right:18px;
   z-index:2;
   display:none;
   align-items:center;
@@ -501,7 +503,7 @@ body.scroll-mode #player{z-index:60}
 /* swipe hint */
 .sv-hint{
   position:absolute;
-  bottom:88px;left:50%;transform:translateX(-50%);
+  bottom:calc(env(safe-area-inset-bottom, 0px) + 40px);left:50%;transform:translateX(-50%);
   font-size:.58rem;color:rgba(255,255,255,.35);
   letter-spacing:.06em;text-transform:uppercase;
   pointer-events:none;
@@ -1592,6 +1594,12 @@ viewToggle.addEventListener('click',()=>{
     updateSvProgress();
   } else {
     if(svObserver){ svObserver.disconnect(); svObserver=null; }
+    // restore global player if something is playing
+    if(currentSongId){
+      const song=songs.find(s=>s.id===currentSongId);
+      if(song) updatePlayerUI(song);
+      player.classList.toggle('visible',!!currentSongId);
+    }
     render();
   }
 });
@@ -1604,6 +1612,11 @@ svClose.addEventListener('click',()=>{
   viewToggle.classList.remove('active');
   viewToggleIcon.innerHTML=SCROLL_ICON;
   if(svObserver){ svObserver.disconnect(); svObserver=null; }
+  if(currentSongId){
+    const song=songs.find(s=>s.id===currentSongId);
+    if(song) updatePlayerUI(song);
+    player.classList.toggle('visible',!!currentSongId);
+  }
   render();
 });
 
