@@ -111,7 +111,7 @@ body{font-family:'DM Mono',monospace;background:var(--bg);color:var(--text);min-
 .link-btn:hover{background:var(--text);color:var(--bg);border-color:var(--text)}
 .link-btn svg{width:10px;height:10px;flex-shrink:0}
 .no-link{font-size:.6rem;color:var(--text-light);font-style:italic}
-.listened-badge{display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:4px;font-size:.6rem;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;border:none;font-family:'DM Mono',monospace;transition:all .12s;flex-shrink:0}
+.listened-badge{display:inline-flex;align-items:center;gap:5px;padding:6px 13px;border-radius:6px;font-size:.68rem;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;border:none;font-family:'DM Mono',monospace;transition:all .12s;flex-shrink:0;font-weight:500}
 .listened-badge.yes{background:var(--green-soft);color:var(--green)}
 .listened-badge.no{background:var(--tag-bg);color:var(--text-muted)}
 .listened-badge:hover{filter:brightness(.94)}
@@ -666,6 +666,11 @@ body.scroll-mode #player{z-index:60}
         </div>
       </div>
 
+      <div class="field" id="dateField" style="display:none">
+        <label>Fecha de adición</label>
+        <input type="date" id="manualDate" style="color-scheme:light dark">
+      </div>
+
       <details>
         <summary style="font-size:.65rem;color:var(--text-muted);cursor:pointer;letter-spacing:.04em;text-transform:uppercase;list-style:none;display:flex;align-items:center;gap:6px;user-select:none">
           <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" style="width:11px;height:11px"><line x1="8" y1="2" x2="8" y2="14"/><line x1="2" y1="8" x2="14" y2="8"/></svg>
@@ -1193,6 +1198,8 @@ function openAddModal(){
   uploadProgress.classList.remove('visible');
   uploadFill.style.width='0%';
   setModalRating(0);
+  document.getElementById('dateField').style.display='none';
+  document.getElementById('manualDate').value='';
   document.getElementById('modalTitle').textContent='Añadir canción';
   document.getElementById('searchSection').style.display='';
   selectedPreview.style.display='';
@@ -1236,6 +1243,17 @@ function openEditModal(id){
   setModalRating(song.rating||0);
   document.getElementById('modalTitle').textContent='Editar canción';
 
+  // Populate date field
+  const dateField=document.getElementById('dateField');
+  const dateInput=document.getElementById('manualDate');
+  dateField.style.display='';
+  if(song.addedAt){
+    const d=song.addedAt.toDate?song.addedAt.toDate():new Date(song.addedAt);
+    dateInput.value=d.toISOString().slice(0,10);
+  } else {
+    dateInput.value='';
+  }
+
   // Open the manual details so fields are visible
   const details=modalOverlay.querySelector('details');
   if(details) details.open=true;
@@ -1247,9 +1265,10 @@ function openEditModal(id){
 function closeModal(){
   modalOverlay.classList.remove('open');
   editingId=null;
-  // restore search section for next add
   document.getElementById('searchSection').style.display='';
   selectedPreview.style.display='';
+  document.getElementById('dateField').style.display='none';
+  document.getElementById('manualDate').value='';
   const details=modalOverlay.querySelector('details');
   if(details) details.open=false;
 }
@@ -1271,10 +1290,13 @@ document.getElementById('modalSave').addEventListener('click', async()=>{
       // EDIT MODE — only update audioUrl if a new file was uploaded
       const existing=songs.find(s=>s.id===editingId);
       const audioUrl=pendingAudioUrl!==null ? pendingAudioUrl : (existing?.audioUrl||'');
+      const dateVal=document.getElementById('manualDate').value;
+      const addedAt=dateVal ? new Date(dateVal) : (existing?.addedAt||null);
       await updateDoc(doc(db,'songs',editingId),{
         title, artist, cover, link,
         audioUrl,
         rating: modalRating,
+        ...(addedAt ? {addedAt} : {})
       });
       showToast('Canción actualizada ✓');
     } else {
